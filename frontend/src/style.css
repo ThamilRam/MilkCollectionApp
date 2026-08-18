@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.bg-gray-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(245 245 245);
+}
+@layer components {
+  .table-container {
+    @apply overflow-auto max-h-[60vh] border border-gray-200 rounded-lg;
+  }
+  .table-container table {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+  .table-container thead {
+    @apply bg-gray-50 sticky top-0 z-10;
+  }
+  .table-container thead th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap;
+  }
+  .table-container tbody {
+    @apply bg-white divide-y divide-gray-200;
+  }
+  .table-container tbody td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+}
