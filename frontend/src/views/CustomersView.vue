@@ -74,6 +74,14 @@
             class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
+        <label class="flex items-center gap-3 self-end min-h-10 text-sm font-medium text-gray-700">
+          <input
+            v-model="form.isMilkcustomer"
+            type="checkbox"
+            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          />
+          Is milk customer
+        </label>
       </div>
       <div class="mt-4 flex items-center justify-between">
         <button
@@ -107,6 +115,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Village</th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Milk Customer</th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"></th>
           </tr>
         </thead>
@@ -140,6 +149,11 @@
                 {{ c.status }}
               </span>
             </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span :class="c.isMilkcustomer !== false ? 'text-green-700' : 'text-gray-500'">
+                {{ c.isMilkcustomer !== false ? 'Yes' : 'No' }}
+              </span>
+            </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <button
                 @click="editCustomer(c)"
@@ -156,7 +170,7 @@
             </td>
           </tr>
           <tr v-if="store.customers.length === 0">
-            <td colspan="8" class="px-6 py-12 text-center text-gray-500">No customers found</td>
+            <td colspan="9" class="px-6 py-12 text-center text-gray-500">No customers found</td>
           </tr>
         </tbody>
       </table>
@@ -182,7 +196,8 @@ const defaultForm = {
   village: '',
   opening_balance: 0,
   status: 'Active',
-  start_date: new Date().toISOString().split('T')[0]
+  start_date: new Date().toISOString().split('T')[0],
+  isMilkcustomer: true
 }
 
 const form = ref({ ...defaultForm })

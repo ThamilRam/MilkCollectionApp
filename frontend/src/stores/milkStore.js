@@ -6,6 +6,8 @@ const API_URL = import.meta.env.VITE_API_URL
 export const useMilkStore = defineStore('milk', {
   state: () => ({
     customers: [],
+    products: [],
+    purchases: [],
     entries: [],
     payments: [],
     dashboard: null,
@@ -27,7 +29,13 @@ export const useMilkStore = defineStore('milk', {
     customerOptions: (state) => state.customers.map(c => ({
       value: c.customer_id,
       label: `${c.customer_id} - ${c.name}`
-    }))
+    })),
+    milkCustomerOptions: (state) => state.customers
+      .filter(c => c.isMilkcustomer !== false)
+      .map(c => ({
+        value: c.customer_id,
+        label: `${c.customer_id} - ${c.name}`
+      }))
   },
   actions: {
     async fetchCustomers() {
@@ -40,6 +48,54 @@ export const useMilkStore = defineStore('milk', {
       } finally {
         this.loading = false
       }
+    },
+    async fetchProducts() {
+      this.loading = true
+      try {
+        const { data } = await axios.get(`${API_URL}/products`)
+        this.products = data
+      } catch (err) {
+        this.error = err.message
+        throw err
+      } finally {
+        this.loading = false
+      }
+    },
+    async createProduct(product) {
+      const { data } = await axios.post(`${API_URL}/products`, product)
+      this.products.push(data)
+      return data
+    },
+    async updateProduct(id, product) {
+      const { data } = await axios.put(`${API_URL}/products/${id}`, product)
+      const index = this.products.findIndex(item => item.id === id)
+      if (index !== -1) this.products[index] = data
+      return data
+    },
+    async deleteProduct(id) {
+      await axios.delete(`${API_URL}/products/${id}`)
+      this.products = this.products.filter(item => item.id !== id)
+    },
+    async fetchPurchases(customerId) {
+      const { data } = await axios.get(`${API_URL}/purchases`, { params: { customer_id: customerId } })
+      this.purchases = data
+    },
+    async createPurchase(purchase) {
+      const { data } = await axios.post(`${API_URL}/purchases`, purchase)
+      this.purchases.unshift(data)
+      const product = this.products.find(item => item.id === purchase.product_id)
+      if (product) product.quantity = Number(product.quantity) - Number(purchase.quantity)
+      return data
+    },
+    async updatePurchasePaid(id, paid) {
+      const { data } = await axios.patch(`${API_URL}/purchases/${id}`, { paid })
+      const index = this.purchases.findIndex(item => item.id === id)
+      if (index !== -1) this.purchases[index] = data
+      return data
+    },
+    async deletePurchase(id) {
+      await axios.delete(`${API_URL}/purchases/${id}`)
+      this.purchases = this.purchases.filter(item => item.id !== id)
     },
     async fetchEntries(params = {}) {
       this.loading = true

@@ -28,6 +28,7 @@ class CustomerBase(BaseModel):
     opening_balance: Decimal = Decimal("0")
     status: str = Field(default="Active", max_length=20)
     start_date: Optional[date] = None
+    isMilkcustomer: bool = True
 
 class CustomerCreate(CustomerBase):
     pass
@@ -114,3 +115,45 @@ class SettingBase(BaseModel):
 class SettingResponse(SettingBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+
+class ProductBase(BaseModel):
+    product_name: str = Field(..., min_length=1, max_length=150)
+    description: Optional[str] = None
+    quantity: Decimal = Field(default=Decimal("0"), ge=0)
+    size: Optional[str] = Field(None, max_length=50)
+    price: Decimal = Field(default=Decimal("0"), ge=0)
+    active: bool = True
+
+class ProductCreate(ProductBase):
+    pass
+
+class ProductResponse(ProductBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
+class PurchaseBase(BaseModel):
+    customer_id: str
+    product_id: int
+    quantity: Decimal = Field(..., gt=0)
+    paid: bool = False
+
+class PurchaseCreate(PurchaseBase):
+    pass
+
+class PurchaseProductResponse(ProductResponse):
+    pass
+
+class PurchaseResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    customer_id: str
+    product_id: int
+    quantity: Decimal
+    unit_price: Decimal
+    amount: Decimal
+    paid: bool
+    created_at: Optional[datetime] = None
+    product: PurchaseProductResponse
+
+class PurchasePaidUpdate(BaseModel):
+    paid: bool

@@ -283,7 +283,7 @@ const loadCustomers = async () => {
       defaultRate.value = Number(settings.default_rate)
     }
     rows.value = customers
-      .filter(c => c.status === 'Active')
+      .filter(c => c.status === 'Active' && c.isMilkcustomer !== false)
       .map(c => ({
         customer_id: c.customer_id,
         name: c.name,

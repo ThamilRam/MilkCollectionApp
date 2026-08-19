@@ -149,6 +149,8 @@ const navItems = [
   { name: 'Daily Entry', path: '/daily-entry' },
   { name: 'Bulk Entry', path: '/bulk-entry' },
   { name: 'Customers', path: '/customers' },
+  { name: 'Products', path: '/products' },
+  { name: 'Purchase Products', path: '/purchase-products' },
   { name: 'Portal', path: '/portal' },
   { name: 'Payments', path: '/payments' }
 ]

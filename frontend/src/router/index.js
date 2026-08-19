@@ -13,6 +13,8 @@ const routes = [
       { path: 'daily-entry', name: 'DailyEntry', component: () => import('../views/DailyEntryView.vue') },
       { path: 'bulk-entry', name: 'BulkEntry', component: () => import('../views/BulkEntryView.vue') },
       { path: 'customers', name: 'Customers', component: () => import('../views/CustomersView.vue') },
+      { path: 'products', name: 'Products', component: () => import('../views/ProductsView.vue') },
+      { path: 'purchase-products', name: 'PurchaseProducts', component: () => import('../views/PurchaseProductsView.vue') },
       { path: 'portal/:id?', name: 'CustomerPortal', component: () => import('../views/CustomerPortalView.vue') },
       { path: 'payments', name: 'Payments', component: () => import('../views/PaymentsView.vue') }
     ]

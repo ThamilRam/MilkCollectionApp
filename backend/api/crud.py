@@ -46,6 +46,86 @@ def delete_customer(db: Session, customer_id: str):
     db.commit()
     return db_customer
 
+def get_products(db: Session, skip: int = 0, limit: int = 1000):
+    return db.query(models.Product).order_by(models.Product.product_name).offset(skip).limit(limit).all()
+
+def get_product(db: Session, product_id: int):
+    return db.query(models.Product).filter(models.Product.id == product_id).first()
+
+def create_product(db: Session, product: schemas.ProductCreate):
+    db_product = models.Product(**product.model_dump())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+def update_product(db: Session, product_id: int, product: schemas.ProductCreate):
+    db_product = get_product(db, product_id)
+    if not db_product:
+        return None
+    for key, value in product.model_dump().items():
+        setattr(db_product, key, value)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+def delete_product(db: Session, product_id: int):
+    db_product = get_product(db, product_id)
+    if not db_product:
+        return None
+    db.delete(db_product)
+    db.commit()
+    return db_product
+
+def get_purchases(db: Session, customer_id: str):
+    return db.query(models.PurchaseRecord).filter(
+        models.PurchaseRecord.customer_id == customer_id
+    ).order_by(models.PurchaseRecord.created_at.desc()).all()
+
+def create_purchase(db: Session, purchase: schemas.PurchaseCreate):
+    customer = get_customer(db, purchase.customer_id)
+    product = get_product(db, purchase.product_id)
+    if not customer or not product:
+        return None, "Customer or product not found"
+    if not product.active:
+        return None, "Product is inactive"
+    if purchase.quantity > product.quantity:
+        return None, "Purchase quantity exceeds available quantity"
+
+    db_purchase = models.PurchaseRecord(
+        customer_id=purchase.customer_id,
+        product_id=purchase.product_id,
+        quantity=purchase.quantity,
+        unit_price=product.price,
+        amount=purchase.quantity * product.price,
+        paid=purchase.paid,
+    )
+    product.quantity -= purchase.quantity
+    db.add(db_purchase)
+    db.commit()
+    db.refresh(db_purchase)
+    return db_purchase, None
+
+def update_purchase_paid(db: Session, purchase_id: int, paid: bool):
+    purchase = db.query(models.PurchaseRecord).filter(models.PurchaseRecord.id == purchase_id).first()
+    if not purchase:
+        return None
+    purchase.paid = paid
+    db.commit()
+    db.refresh(purchase)
+    return purchase
+
+def delete_purchase(db: Session, purchase_id: int):
+    purchase = db.query(models.PurchaseRecord).filter(models.PurchaseRecord.id == purchase_id).first()
+    if not purchase:
+        return None
+    product = get_product(db, purchase.product_id)
+    if product:
+        product.quantity += purchase.quantity
+    db.delete(purchase)
+    db.commit()
+    return purchase
+
 def get_entries(db: Session, from_date=None, to_date=None, customer_id=None, session=None, skip=0, limit=50000):
     query = db.query(models.DailyEntry)
     if from_date:

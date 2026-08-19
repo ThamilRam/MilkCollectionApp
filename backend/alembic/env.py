@@ -12,7 +12,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from api.database import Base, SQLALCHEMY_DATABASE_URL
-from api.models import User, Customer, DailyEntry, PaymentRecord, Setting
+from api.models import User, Customer, DailyEntry, PaymentRecord, Setting, Product
 
 # this is the Alembic Config object
 config = context.config
